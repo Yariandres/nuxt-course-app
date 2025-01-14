@@ -1,51 +1,50 @@
 <script setup lang="ts">
 const course = useCourse();
+definePageMeta({
+  layout: 'default',
+});
 </script>
 
 <template>
-  <div
-    class="p-12 bg-gray-100 w-full h-full min-h-screen flex flex-col items-center"
-  >
-    <div class="prose mb-12">
-      <h1>
-        <span class="font-medium">
-          Course:
-          <span class="font-bold">Mastering Nuxt 3</span>
-        </span>
-      </h1>
-    </div>
-    <div class="flex flex-row justify-center flex-grow">
-      <div
-        class="prose mr-4 p-8 bg-white rounded-md min-w-[20ch] max-w-[30ch] flex flex-col"
-      >
-        <h3 class="mb-4">Chapters</h3>
-        <hr class="my-4" />
-        <ul class="list-none p-0 m-0 flex flex-col gap-4">
-          <li v-for="chapter in course.chapters" :key="chapter.slug">
-            <h4 class="text-sm text-gray-900">
-              {{ chapter.title }}
-            </h4>
+  <div class="prose mb-12">
+    <h1>
+      <span class="font-medium">
+        Course:
+        <span class="font-bold">Mastering Nuxt 3</span>
+      </span>
+    </h1>
+  </div>
+  <div class="flex flex-row justify-center flex-grow">
+    <div
+      class="prose mr-4 p-8 bg-white rounded-md min-w-[20ch] max-w-[30ch] flex flex-col"
+    >
+      <h3 class="mb-4">Chapters</h3>
+      <hr class="my-4" />
+      <ul class="list-none p-0 m-0 flex flex-col gap-4">
+        <li v-for="chapter in course.chapters" :key="chapter.slug">
+          <h4 class="text-sm text-gray-900">
+            {{ chapter.title }}
+          </h4>
 
-            <NuxtLink
-              v-for="(lesson, index) in chapter.lessons"
-              :key="lesson.slug"
-              :to="lesson.path"
-              class="flex flex-row space-x-1 no-underline prose-sm font-normal py-1"
-              :class="{
-                'text-blue-500': lesson.path === $route.path,
-              }"
-            >
-              <span class="text-gray-500"> {{ lesson.number }}. </span>
-              <span class="text-sm font-normal">
-                {{ lesson.title }}
-              </span>
-            </NuxtLink>
-          </li>
-        </ul>
-      </div>
-      <div class="prose p-12 bg-white rounded-md w-[65ch]">
-        <NuxtPage />
-      </div>
+          <NuxtLink
+            v-for="(lesson, index) in chapter.lessons"
+            :key="lesson.slug"
+            :to="lesson.path"
+            class="flex flex-row space-x-1 no-underline prose-sm font-normal py-1"
+            :class="{
+              'text-blue-500': lesson.path === $route.path,
+            }"
+          >
+            <span class="text-gray-500"> {{ lesson.number }}. </span>
+            <span class="text-sm font-normal">
+              {{ lesson.title }}
+            </span>
+          </NuxtLink>
+        </li>
+      </ul>
+    </div>
+    <div class="prose p-12 bg-white rounded-md w-[65ch]">
+      <NuxtPage />
     </div>
   </div>
 </template>
