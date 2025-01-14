@@ -22,12 +22,10 @@ definePageMeta({
       <hr class="my-4" />
       <ul class="list-none p-0 m-0 flex flex-col gap-4">
         <li v-for="chapter in course.chapters" :key="chapter.slug">
-          <h4 class="text-sm text-gray-900">
-            {{ chapter.title }}
-          </h4>
+          <h4 class="text-sm text-gray-900 font-bold">{{ chapter.title }}</h4>
 
           <NuxtLink
-            v-for="(lesson, index) in chapter.lessons"
+            v-for="lesson in chapter.lessons"
             :key="lesson.slug"
             :to="lesson.path"
             class="flex flex-row space-x-1 no-underline prose-sm font-normal py-1"
