@@ -8,11 +8,25 @@ const chapter = computed(() => {
   );
 });
 
+if (!chapter.value) {
+  throw createError({
+    statusCode: 404,
+    statusMessage: 'Chapter not found',
+  });
+}
+
 const lesson = computed(() => {
   return chapter.value?.lessons.find(
     (lesson: any) => lesson.slug === route.params.lessonSlug
   );
 });
+
+if (!lesson.value) {
+  throw createError({
+    statusCode: 404,
+    statusMessage: 'Lesson not found',
+  });
+}
 
 const title = computed(() => {
   return `${lesson.value?.title} - ${chapter.value?.number}`;
