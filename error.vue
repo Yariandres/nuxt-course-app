@@ -4,7 +4,7 @@ const error = useError();
 const resetError = () => {
   clearError({
     redirect:
-      '/course/chapter/1-chapter-1/lesson/2-typescript-in-vue-components',
+      '/course/chapter/1-chapter-1/lesson/1-introduction-to-typescript-with-vue-js-3',
   });
 };
 </script>
@@ -26,7 +26,12 @@ const resetError = () => {
       <p>Sorry about that!</p>
       <p class="text-red-500 font-bold">{{ error?.message }}</p>
 
-      <button @click="resetError">Reset</button>
+      <button
+        class="hover:cursor-pointer bg-gray-500 text-white px-2 py-1 rounded-md mt-4"
+        @click="resetError"
+      >
+        Reset
+      </button>
     </div>
   </NuxtLayout>
 </template>
