@@ -3,6 +3,10 @@ const course = useCourse();
 definePageMeta({
   layout: 'default',
 });
+
+const resetError = (error: Error) => {
+  error.value = null;
+};
 </script>
 
 <template>
@@ -42,7 +46,23 @@ definePageMeta({
       </ul>
     </div>
     <div class="prose p-12 bg-white rounded-md w-[65ch]">
-      <NuxtPage />
+      <NuxtErrorBoundary>
+        <NuxtPage />
+        <template #error="{ error }">
+          <div class="prose">
+            <h1>Oh no! Something went wrong with the lesson</h1>
+            <p v-if="error" class="text-red-500">
+              {{ error }}
+            </p>
+            <button
+              class="hover:cursor-pointer bg-gray-500 text-white px-2 py-1 rounded-md mt-4"
+              @click="resetError(error)"
+            >
+              Reset
+            </button>
+          </div>
+        </template>
+      </NuxtErrorBoundary>
     </div>
   </div>
 </template>
