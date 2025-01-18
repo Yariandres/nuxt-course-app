@@ -2,5 +2,13 @@
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
-  modules: ['@vueuse/nuxt', '@nuxtjs/tailwindcss']
-})
+  modules: ['@vueuse/nuxt', '@nuxtjs/tailwindcss', '@nuxtjs/supabase'],
+  supabase: {
+    // redirect: false,
+    redirectOptions: {
+      login: '/login',
+      callback: '/course',
+      exclude: ['/*'],
+    },
+  },
+});
