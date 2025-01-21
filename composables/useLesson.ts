@@ -1,19 +1,29 @@
+import type { LessonWithPath } from '~/types/course';
+import { StorageSerializers } from '@vueuse/core';
+
 export default async (chapterSlug: string, lessonSlug: string) => {
-  // use session to get the user id
-  const { data: session } = useSession();
-  const userId = session?.user?.id;
+  // use sessionStorage to cache the lesson
+  const url = `/api/course/chapter/${chapterSlug}/lesson/${lessonSlug}`;
+  const lesson = useSessionStorage<LessonWithPath>(url, null, {
+    // by passing null as a default value, it cant automatically determine which serializer to use
+    serializer: StorageSerializers.object,
+  });
 
-  const { data, error } = await useFetch(
-    `/api/course/chapter/${chapterSlug}/lesson/${lessonSlug}`
-  );
+  if (!lesson.value) {
+    const { data, error } = await useFetch<LessonWithPath>(url);
+    if (error.value) {
+      throw createError({
+        ...error.value,
+        statusMessage: `Could not fetch lesson ${lessonSlug} in chapter ${chapterSlug}`,
+      });
+    }
 
-  if (error.value) {
-    throw createError({
-      ...error.value,
-      statusCode: 404,
-      statusMessage: `Could not fetch lesson ${lessonSlug} in chapter ${chapterSlug}`,
-    });
+    lesson.value = data.value;
+  } else {
+    console.log(
+      `Getting lesson ${lessonSlug} in chapter ${chapterSlug} from cache`
+    );
   }
 
-  return data;
+  return lesson.value;
 };
