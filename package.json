@@ -9,6 +9,9 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare"
   },
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  },
   "dependencies": {
     "@nuxtjs/tailwindcss": "6.12.2",
     "@vueuse/nuxt": "12.4.0",
@@ -18,6 +21,7 @@
   },
   "devDependencies": {
     "@nuxtjs/supabase": "^1.4.5",
+    "@prisma/client": "^6.2.1",
     "@vueuse/core": "^12.4.0"
   }
 }
