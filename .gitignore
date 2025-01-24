@@ -22,6 +22,7 @@ logs
 .env
 .env.*
 !.env.example
+*.DS_Store
 
 # Local Netlify folder
 .netlify
