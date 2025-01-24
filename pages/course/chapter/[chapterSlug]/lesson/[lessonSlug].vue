@@ -1,37 +1,36 @@
 <script setup lang="ts">
-const course = useCourse();
+const course = await useCourse();
 const route = useRoute();
 const { chapterSlug, lessonSlug } = route.params;
 const lesson = await useLesson(chapterSlug, lessonSlug);
 
 definePageMeta({
   middleware: [
-    function ({ params }, from) {
-      const course = useCourse();
+    async function ({ params }, from) {
+      const course = await useCourse();
 
-      const chapter = course.chapters.find(
-        (chapter: any) => chapter.slug === params.chapterSlug
+      const chapter = course.value.chapters.find(
+        (chapter) => chapter.slug === params.chapterSlug
       );
 
       if (!chapter) {
         return abortNavigation(
           createError({
             statusCode: 404,
-            statusMessage: 'Chapter not found',
+            message: 'Chapter not found',
           })
         );
       }
 
-      //  validate lesson route
       const lesson = chapter.lessons.find(
-        (lesson: any) => lesson.slug === params.lessonSlug
+        (lesson) => lesson.slug === params.lessonSlug
       );
 
       if (!lesson) {
         return abortNavigation(
           createError({
             statusCode: 404,
-            statusMessage: 'Lesson not found',
+            message: 'Lesson not found',
           })
         );
       }
@@ -41,37 +40,39 @@ definePageMeta({
 });
 
 const chapter = computed(() => {
-  return course.chapters.find(
-    (chapter: any) => chapter.slug === route.params.chapterSlug
+  return course.value.chapters.find(
+    (chapter) => chapter.slug === route.params.chapterSlug
   );
 });
 
 const title = computed(() => {
-  return `${lesson.value?.title} - ${chapter.value?.number}`;
+  return `${lesson.value.title} - ${course.value.title}`;
 });
-
 useHead({
   title,
 });
 
 const progress = useLocalStorage('progress', []);
 
-const isLessonCompleted = computed(() => {
-  if (!progress.value[chapter.value?.number - 1]) return false;
-  if (!progress.value[chapter.value?.number - 1][lesson.value?.number - 1]) {
+const isLessonComplete = computed(() => {
+  if (!progress.value[chapter.value.number - 1]) {
     return false;
   }
 
-  return progress.value[chapter.value?.number - 1][lesson.value?.number - 1];
+  if (!progress.value[chapter.value.number - 1][lesson.value.number - 1]) {
+    return false;
+  }
+
+  return progress.value[chapter.value.number - 1][lesson.value.number - 1];
 });
 
 const toggleComplete = () => {
-  if (!progress.value[chapter.value?.number - 1]) {
-    progress.value[chapter.value?.number - 1] = [];
+  if (!progress.value[chapter.value.number - 1]) {
+    progress.value[chapter.value.number - 1] = [];
   }
 
-  progress.value[chapter.value?.number - 1][lesson.value?.number - 1] =
-    !isLessonCompleted.value;
+  progress.value[chapter.value.number - 1][lesson.value.number - 1] =
+    !isLessonComplete.value;
 };
 </script>
 

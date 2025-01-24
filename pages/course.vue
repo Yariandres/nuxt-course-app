@@ -1,21 +1,19 @@
 <script setup lang="ts">
-const course = useCourse();
-definePageMeta({
-  layout: 'default',
-});
+const course = await useCourse();
+const firstLesson = await useFirstLesson();
 
-const resetError = (error: Error) => {
+const resetError = async (error: any) => {
+  await navigateTo(firstLesson.path);
   error.value = null;
 };
 </script>
 
 <template>
   <div>
-    <div class="mb-12 flex justify-between items-center w-full">
-      <h1>
+    <div class="mb-4 flex justify-between items-center w-full">
+      <h1 class="text-3xl">
         <span class="font-medium">
-          Course:
-          <span class="font-bold">Mastering Nuxt 3</span>
+          <span class="font-bold">{{ course.title }}</span>
         </span>
       </h1>
       <UserCard />
@@ -25,52 +23,51 @@ const resetError = (error: Error) => {
       <div
         class="prose mr-4 p-8 bg-white rounded-md min-w-[20ch] max-w-[30ch] flex flex-col"
       >
-        <h3 class="mb-4">Chapters</h3>
-        <hr class="my-4" />
-        <ul class="list-none p-0 m-0 flex flex-col gap-4">
-          <li v-for="chapter in course.chapters" :key="chapter.slug">
-            <h4 class="text-sm text-gray-900 font-bold">{{ chapter.title }}</h4>
-
-            <NuxtLink
-              v-for="lesson in chapter.lessons"
-              :key="lesson.slug"
-              :to="lesson.path"
-              class="flex flex-row space-x-1 no-underline prose-sm font-normal py-1"
-              :class="{
-                'text-blue-500': lesson.path === $route.path,
-              }"
-            >
-              <span class="text-gray-500"> {{ lesson.number }}. </span>
-              <span class="text-sm font-normal">
-                {{ lesson.title }}
-              </span>
-            </NuxtLink>
-          </li>
-        </ul>
+        <h3>Chapters</h3>
+        <div
+          class="space-y-1 mb-4 flex flex-col"
+          v-for="chapter in course.chapters"
+          :key="chapter.slug"
+        >
+          <h4>{{ chapter.title }}</h4>
+          <NuxtLink
+            v-for="(lesson, index) in chapter.lessons"
+            :key="lesson.slug"
+            class="flex flex-row space-x-1 no-underline prose-sm font-normal py-1 px-4 -mx-4"
+            :to="lesson.path"
+            :class="{
+              'text-blue-500': lesson.path === $route.fullPath,
+              'text-gray-600': lesson.path !== $route.fullPath,
+            }"
+          >
+            <span class="text-gray-500">{{ index + 1 }}.</span>
+            <span>{{ lesson.title }}</span>
+          </NuxtLink>
+        </div>
       </div>
+
       <div class="prose p-12 bg-white rounded-md w-[65ch]">
         <NuxtErrorBoundary>
           <NuxtPage />
           <template #error="{ error }">
-            <div class="prose">
-              <h1>Oh no! Something went wrong with the lesson</h1>
-              <p v-if="error" class="text-red-500">
-                {{ error }}
-              </p>
+            <p>
+              Oh no, something went wrong with the lesson!
+              <code>{{ error }}</code>
+            </p>
+            <p>
               <button
-                class="hover:cursor-pointer bg-gray-500 text-white px-2 py-1 rounded-md mt-4"
+                class="hover:cursor-pointer bg-gray-500 text-white font-bold py-1 px-3 rounded"
                 @click="resetError(error)"
               >
                 Reset
               </button>
-            </div>
+            </p>
           </template>
         </NuxtErrorBoundary>
       </div>
     </div>
   </div>
 </template>
-
 <style scoped>
 .router-link-active {
   @apply text-blue-500;
