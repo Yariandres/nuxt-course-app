@@ -1,8 +1,14 @@
 <script setup lang="ts">
+import { useCourseProgress } from '~/stores/courseProgress';
 const course = await useCourse();
+const user = useSupabaseUser();
 const route = useRoute();
 const { chapterSlug, lessonSlug } = route.params;
 const lesson = await useLesson(chapterSlug, lessonSlug);
+const store = useCourseProgress();
+const { initialize, toggleComplete } = store;
+
+initialize();
 
 definePageMeta({
   middleware: [
@@ -39,6 +45,11 @@ definePageMeta({
   ],
 });
 
+// Check if the current lesson is completed
+const isCompleted = computed(() => {
+  return store.progress?.[chapterSlug]?.[lessonSlug] || 0;
+});
+
 const chapter = computed(() => {
   return course.value.chapters.find(
     (chapter) => chapter.slug === route.params.chapterSlug
@@ -51,60 +62,36 @@ const title = computed(() => {
 useHead({
   title,
 });
-
-const progress = useLocalStorage('progress', []);
-
-const isLessonComplete = computed(() => {
-  if (!progress.value[chapter.value.number - 1]) {
-    return false;
-  }
-
-  if (!progress.value[chapter.value.number - 1][lesson.value.number - 1]) {
-    return false;
-  }
-
-  return progress.value[chapter.value.number - 1][lesson.value.number - 1];
-});
-
-const toggleComplete = () => {
-  if (!progress.value[chapter.value.number - 1]) {
-    progress.value[chapter.value.number - 1] = [];
-  }
-
-  progress.value[chapter.value.number - 1][lesson.value.number - 1] =
-    !isLessonComplete.value;
-};
 </script>
 
 <template>
-  <div class="flex flex-col gap-4">
+  <div>
     <p class="mt-0 uppercase font-bold text-slate-400 mb-1">
-      Lesson {{ chapter?.number }} - {{ lesson?.number }}
+      Lesson {{ chapter.number }} - {{ lesson.number }}
     </p>
-    <h2 class="my-0">{{ lesson?.title }}</h2>
+    <h2 class="my-0">{{ lesson.title }}</h2>
     <div class="flex space-x-4 mt-2 mb-8">
       <NuxtLink
-        v-if="lesson?.sourceUrl"
-        class="font-normal text-md text-gray-500 underline"
-        :to="lesson?.sourceUrl"
+        v-if="lesson.sourceUrl"
+        class="font-normal text-md text-gray-500"
+        :to="lesson.sourceUrl"
       >
         Download Source Code
       </NuxtLink>
       <NuxtLink
-        v-if="lesson?.downloadUrl"
-        class="font-normal text-md text-gray-500 underline"
-        :to="lesson?.downloadUrl"
+        v-if="lesson.downloadUrl"
+        class="font-normal text-md text-gray-500"
+        :to="lesson.downloadUrl"
       >
         Download Video
       </NuxtLink>
     </div>
-    <VideoPlayer :videoId="lesson?.videoId" />
-    <p>{{ lesson?.text }}</p>
-    <div>
-      <LessonComplete
-        v-model="isLessonCompleted"
-        @update:modelValue="toggleComplete"
-      />
-    </div>
+    <VideoPlayer v-if="lesson.videoId" :videoId="lesson.videoId" />
+    <p>{{ lesson.text }}</p>
+    <LessonComplete
+      v-if="user"
+      :model-value="isCompleted"
+      @update:model-value="toggleComplete"
+    />
   </div>
 </template>
