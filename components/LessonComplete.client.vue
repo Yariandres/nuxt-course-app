@@ -1,11 +1,12 @@
-<script setup lang="ts">
-const props = defineProps<{
-  modelValue: boolean;
-}>();
+<script setup>
+defineProps({
+  modelValue: {
+    type: Boolean,
+    default: false,
+  },
+});
 
-const emit = defineEmits<{
-  (e: 'update:modelValue', value: boolean): void;
-}>();
+defineEmits(['update:modelValue']);
 </script>
 
 <template>
