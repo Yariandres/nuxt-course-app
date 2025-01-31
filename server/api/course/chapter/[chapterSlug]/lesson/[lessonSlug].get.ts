@@ -4,7 +4,8 @@ import protectRoute from '~/server/utils/protectRoute';
 const prisma = new PrismaClient();
 
 export default defineEventHandler(async (event) => {
-  if (event.context.params?.slug !== '1-chapter-1') {
+  // We allow users to access the first lesson without being logged in
+  if (event.context.params?.chapterSlug !== '1-chapter-1') {
     protectRoute(event);
   }
 
