@@ -46,9 +46,7 @@ definePageMeta({
 });
 
 // Check if the current lesson is completed
-const isCompleted = computed(() => {
-  return store.progress?.[chapterSlug]?.[lessonSlug] || 0;
-});
+const isLessonComplete = computed(() => !!store.progress[lesson.value.id]);
 
 const chapter = computed(() => {
   return course.value.chapters.find(
@@ -90,7 +88,7 @@ useHead({
     <p>{{ lesson.text }}</p>
     <LessonComplete
       v-if="user"
-      :model-value="isCompleted"
+      :model-value="isLessonComplete"
       @update:model-value="toggleComplete"
     />
   </div>
