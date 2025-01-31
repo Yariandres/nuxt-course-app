@@ -1,8 +1,9 @@
 import { defineStore } from 'pinia';
+import type { CourseProgress } from '~/types/course';
 
 export const useCourseProgress = defineStore('courseProgress', () => {
   // Initialize progress from local storage
-  const progress = ref<any>({});
+  const progress = ref<CourseProgress>({});
   const initialized = ref(false);
 
   async function initialize() {
@@ -10,8 +11,51 @@ export const useCourseProgress = defineStore('courseProgress', () => {
     if (initialized.value) return;
     initialized.value = true;
 
-    // TODO: Fetch user progress from endpoint (lesson 6-5)
+    const { data: userProgress } = await useFetch<CourseProgress>(
+      '/api/user/progress',
+      { headers: useRequestHeaders(['cookie']) }
+    );
+
+    // Update progress value
+    if (userProgress.value) {
+      progress.value = userProgress.value;
+    }
   }
+
+  const percentageCompleted = computed(() => {
+    const chapters = Object.values(progress.value).map((chapter) => {
+      const lessons = Object.values(chapter);
+      const completedLessons = lessons.filter((lesson) => lesson);
+      return Number((completedLessons.length / lessons.length) * 100).toFixed(
+        0
+      );
+    }, []);
+
+    const totalLessons = Object.values(progress.value).reduce(
+      (number, chapter) => {
+        return number + Object.values(chapter).length;
+      },
+      0
+    );
+
+    const totalCompletedLessons = Object.values(progress.value).reduce(
+      (number, chapter) => {
+        return (
+          number + Object.values(chapter).filter((lesson) => lesson).length
+        );
+      },
+      0
+    );
+
+    const course = Number((totalCompletedLessons / totalLessons) * 100).toFixed(
+      0
+    );
+
+    return {
+      chapters,
+      course,
+    };
+  });
 
   // Toggle the progress of a lesson based on chapter slug and lesson slug
   const toggleComplete = async (chapter: string, lesson: string) => {
@@ -61,5 +105,6 @@ export const useCourseProgress = defineStore('courseProgress', () => {
     initialize,
     progress,
     toggleComplete,
+    percentageCompleted,
   };
 });
